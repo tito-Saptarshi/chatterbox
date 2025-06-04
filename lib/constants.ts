@@ -1,6 +1,6 @@
 import { FriendRequest, User } from "./types"
 
-const mockFriends: User[] = [
+export const mockFriends: User[] = [
   { id: "1", name: "Alice Johnson", avatar: "/placeholder.svg?height=40&width=40", status: "online" },
   { id: "2", name: "Bob Smith", avatar: "/placeholder.svg?height=40&width=40", status: "away" },
   {
@@ -13,7 +13,7 @@ const mockFriends: User[] = [
   { id: "4", name: "David Wilson", avatar: "/placeholder.svg?height=40&width=40", status: "online" },
 ]
 
-const mockRecommended: User[] = [
+export const mockRecommended: User[] = [
   { id: "5", name: "Emma Brown", avatar: "/placeholder.svg?height=40&width=40", status: "online" },
   {
     id: "6",
@@ -34,7 +34,7 @@ const mockRecommended: User[] = [
   { id: "15", name: "Marcus Johnson", avatar: "/placeholder.svg?height=40&width=40", status: "away" },
 ]
 
-const mockSentRequests: FriendRequest[] = [
+export const mockSentRequests: FriendRequest[] = [
   {
     id: "1",
     user: { id: "8", name: "Henry Taylor", avatar: "/placeholder.svg?height=40&width=40", status: "online" },
@@ -47,7 +47,7 @@ const mockSentRequests: FriendRequest[] = [
   },
 ]
 
-const mockReceivedRequests: FriendRequest[] = [
+export const mockReceivedRequests: FriendRequest[] = [
   {
     id: "1",
     user: { id: "10", name: "Jack Robinson", avatar: "/placeholder.svg?height=40&width=40", status: "online" },
