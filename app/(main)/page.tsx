@@ -1,7 +1,7 @@
 
 
 
-import { FriendsList } from "./components/FriendsList";
+import { FriendsList } from "../components/FriendsList";
 import { mockFriends, mockRecommended } from "@/lib/constants";
 
 
