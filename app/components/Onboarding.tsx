@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,32 +17,58 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, Shuffle, User } from "lucide-react";
 import { toast } from "sonner";
-
+import { useRouter } from "next/navigation";
 
 export default function OnboardingPage() {
+  const router = useRouter();
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const initalState = {
-    message: "",
-    status: "",
-  };
+  const [formData, setFormData] = useState({
+    username: "",
+    fullName: "",
+    bio: "",
+    location: "",
+    profilePicture: "",
+  });
 
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const { mutate: onboardingMutation, isPending } = useMutation({
-    mutationFn: completeOnboarding,
-    onSuccess: () => {
-      toast.success("Profile onboarded successfully");
-      //   queryClient.invalidateQueries({ queryKey: ["authUser"] });
-    },
-    onError: (error) => {
-      toast.error("error");
-    },
-  });
+  const handleSubmit = async (prevState: any, formData: FormData) => {
+    try {
+      // const formValues = {
+      //   title: formData.get("title") as string,
+      //   description: formData.get("description") as string,
+      //   category: formData.get("category") as string,
+      //   link: formData.get("link") as string,
+      // };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onboardingMutation(formState);
+      // await formSchema.parseAsync(formData);
+      // console.log(formValues);
+
+      const result = await createPitch(prevState, formData);
+
+      if (result.status == "SUCCESS") {
+        toast("Onboarding completed");
+
+        router.push(`/`);
+      }
+
+      return result;
+    } catch (error) {
+      toast("An unexpected error has occurred");
+
+      return {
+        ...prevState,
+        error: "An unexpected error has occurred",
+        status: "ERROR",
+      };
+    }
   };
+
+  const [state, formAction, isPending] = useActionState(handleSubmit, {
+    error: "",
+    status: "INITIAL",
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -67,20 +93,6 @@ export default function OnboardingPage() {
     }, 1000);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setFormData((prev) => ({
-          ...prev,
-          profilePicture: event.target?.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
@@ -93,7 +105,7 @@ export default function OnboardingPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form action={formAction} className="space-y-6">
             {/* Profile Picture Section */}
             <div className="flex flex-col items-center space-y-4">
               <div className="relative">
@@ -115,7 +127,6 @@ export default function OnboardingPage() {
                     name="profilePicture"
                     type="file"
                     accept="image/*"
-                    onChange={handleFileUpload}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     id="file-upload"
                   />
@@ -123,6 +134,7 @@ export default function OnboardingPage() {
                     type="button"
                     variant="outline"
                     className="flex items-center gap-2"
+                    disabled
                   >
                     <Upload className="w-4 h-4" />
                     Upload Photo
@@ -203,8 +215,15 @@ export default function OnboardingPage() {
               {/* <Button type="button" variant="outline" className="flex-1">
                 Skip for now
               </Button> */}
-              <Button type="submit" className="flex-1">
+              {/* <Button type="submit" className="flex-1">
                 Complete Setup
+              </Button> */}
+              <Button
+                type="submit"
+                className="startup-form_btn text-white"
+                disabled={isPending}
+              >
+                {isPending ? "Redirecting..." : " Complete Setup"}
               </Button>
             </div>
           </form>
