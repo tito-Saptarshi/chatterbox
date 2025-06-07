@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, Shuffle, User } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { onboarding } from "../actions/user.actions";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function OnboardingPage() {
       // await formSchema.parseAsync(formData);
       // console.log(formValues);
 
-      const result = await createPitch(prevState, formData);
+      const result = await onboarding(prevState, formData);
 
       if (result.status == "SUCCESS") {
         toast("Onboarding completed");
