@@ -36,21 +36,12 @@ export default function OnboardingPage() {
 
   const handleSubmit = async (prevState: any, formData: FormData) => {
     try {
-      // const formValues = {
-      //   title: formData.get("title") as string,
-      //   description: formData.get("description") as string,
-      //   category: formData.get("category") as string,
-      //   link: formData.get("link") as string,
-      // };
-
-      // await formSchema.parseAsync(formData);
-      // console.log(formValues);
-
       const result = await onboarding(prevState, formData);
+
+      console.log("result ", result);
 
       if (result.status == "SUCCESS") {
         toast("Onboarding completed");
-
         router.push(`/`);
       }
 
@@ -80,11 +71,9 @@ export default function OnboardingPage() {
 
   const generateProfilePicture = async () => {
     setIsGenerating(true);
-    // Generate random index between 1-100 for avatar variety
     const randomIdx = Math.floor(Math.random() * 100) + 1;
     const avatarUrl = `https://avatar.iran.liara.run/public/${randomIdx}.png`;
 
-    // Simulate loading time for better UX
     setTimeout(() => {
       setFormData((prev) => ({
         ...prev,
@@ -130,6 +119,7 @@ export default function OnboardingPage() {
                     accept="image/*"
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     id="file-upload"
+                    disabled
                   />
                   <Button
                     type="button"
@@ -154,6 +144,13 @@ export default function OnboardingPage() {
                 </Button>
               </div>
             </div>
+
+            {/* Hidden input to send profilePic */}
+            <input
+              type="hidden"
+              name="profilePic"
+              value={formData.profilePicture}
+            />
 
             {/* Form Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -212,13 +209,16 @@ export default function OnboardingPage() {
               </p>
             </div>
 
+            {/* Show error if any */}
+            {/* {state.error && (
+              <p className="text-center text-red-500 text-sm mt-2">
+                {state.error}
+              </p>
+            )} */}
+
+            {state.error && toast(state.error)}
+
             <div className="flex gap-4 pt-6">
-              {/* <Button type="button" variant="outline" className="flex-1">
-                Skip for now
-              </Button> */}
-              {/* <Button type="submit" className="flex-1">
-                Complete Setup
-              </Button> */}
               <Button
                 type="submit"
                 className="startup-form_btn text-white"
