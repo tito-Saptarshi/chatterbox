@@ -13,7 +13,7 @@ export async function getOnboardedUserOrRedirect() {
 
   await connectDB();
 
-  const dbUser = await User.findOne({ id: user.id });
+  const dbUser = await User.findOne({ userId: user.id});
   
   if (!dbUser) {
     redirect("/onboarding");

@@ -60,7 +60,7 @@ export const onboarding = async (prevState: any, formData: FormData) => {
 
     if (dbUser) {
       // User exists → update it
-      dbUser.userId = "n fgjbdflkgdfgdfg";
+      dbUser.userId = user.id;
       dbUser.fullName = fullName;
       dbUser.username = username;
       dbUser.bio = bio;
@@ -95,7 +95,7 @@ export const onboarding = async (prevState: any, formData: FormData) => {
     } else {
       // User does not exist → create it
       const newUser = await User.create({
-        userId : "n fgjbdflkgdfgdfg",
+        userId : user.id,
         fullName,
         username,
         email,
