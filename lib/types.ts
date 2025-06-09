@@ -25,3 +25,23 @@ export type CurrentUser = {
   bio: string
   avatar: string
 }
+
+// types/user.ts
+import { Types } from "mongoose";
+
+export interface IUser {
+  _id: Types.ObjectId;
+  userId: string;
+  fullName: string;
+  username: string;
+  email: string;
+  bio?: string;
+  profilePic?: string;
+  location?: string;
+  isOnboarded: boolean;
+  friends: Types.ObjectId[];
+  sentRequests: Types.ObjectId[];
+  receivedRequests: Types.ObjectId[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}

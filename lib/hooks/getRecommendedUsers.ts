@@ -1,18 +1,28 @@
-export async function getRecommendedUsers(userId: String) {
-  try {
-    const currentUserId = req.user.id;
-    const currentUser = req.user;
+import { connectDB } from "@/lib/db";
+import User from "@/models/User";
+import { IUser } from "../types";
+import mongoose from "mongoose";
 
-    const recommendedUsers = await User.find({
-      $and: [
-        { _id: { $ne: currentUserId } }, //exclude current user
-        { _id: { $nin: currentUser.friends } }, // exclude current user's friends
-        { isOnboarded: true },
-      ],
-    });
-    res.status(200).json(recommendedUsers);
-  } catch (error) {
-    console.error("Error in getRecommendedUsers controller", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
+export async function getRecommendedUsers(userId: string): Promise<IUser[]> {
+  await connectDB();
+
+  // Get current user including _id and friends
+  const currentUser = await User.findOne({ userId })
+    .select("_id friends")
+    .lean<{ _id: mongoose.Types.ObjectId; friends: mongoose.Types.ObjectId[] } | null>();
+  
+  if (!currentUser) return [];
+
+  // Create safe exclusion list
+  const excludedIds: mongoose.Types.ObjectId[] = [
+    ...(currentUser.friends || []), 
+    currentUser._id
+  ];
+
+  const recommendedUsers = await User.find({
+    _id: { $nin: excludedIds },
+    isOnboarded: true
+  }).lean<IUser[]>();
+
+  return recommendedUsers;
 }
