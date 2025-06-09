@@ -15,11 +15,15 @@ export async function getOnboardedUserOrRedirect() {
 
   const dbUser = await User.findOne({ userId: user.id});
   
+  console.log( "user.id " + user.id);
+  console.log( "dbUser " + dbUser);
+  
+
   if (!dbUser) {
     redirect("/onboarding");
   }
 
-  if (!dbUser.onboarded) {
+  if (!dbUser.isOnboarded) {
     redirect("/onboarding");
   }
 

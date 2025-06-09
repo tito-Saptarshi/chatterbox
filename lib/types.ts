@@ -5,11 +5,17 @@ export type FriendRequest = {
 }
 
 export type User = {
-  id: string
-  name: string
-  avatar: string
-  status: "online" | "offline" | "away"
-  lastSeen?: string
+  userId: string
+  fullName: string
+  username: string
+  email: string
+  bio: string
+  profilePic: string
+  location: string
+  isOnboarded: boolean
+  friends: string[]
+  sentRequests: string[]  
+  receivedRequests: string[]
 }
 
 export type CurrentUser = {

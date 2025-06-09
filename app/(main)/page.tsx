@@ -1,10 +1,13 @@
 import { getOnboardedUserOrRedirect } from "@/lib/hooks/getOnboardedUser";
 import { FriendsList } from "../components/FriendsList";
 import { mockFriends, mockRecommended } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const user = await getOnboardedUserOrRedirect();
-
+  if (!user) {
+    redirect("/onboarding");
+  }
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto px-4 py-6">
