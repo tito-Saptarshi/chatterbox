@@ -1,28 +1,33 @@
-import { connectDB } from "@/lib/db";
+import { currentUser } from "@clerk/nextjs/server";
 import User from "@/models/User";
-import { IUser } from "../types";
-import mongoose from "mongoose";
+import { connectDB } from "../db";
 
-export async function getRecommendedUsers(userId: string): Promise<IUser[]> {
+export async function getRecommendedUsers() {
+  const user = await currentUser();
+
+  if (!user) {
+    return []; // Or handle as you like — maybe throw an error or redirect
+  }
+
   await connectDB();
 
-  // Get current user including _id and friends
-  const currentUser = await User.findOne({ userId })
-    .select("_id friends")
-    .lean<{ _id: mongoose.Types.ObjectId; friends: mongoose.Types.ObjectId[] } | null>();
-  
-  if (!currentUser) return [];
+  // Find the current user in DB using userId (string)
+  const dbUser = await User.findOne({ userId: user.id });
 
-  // Create safe exclusion list
-  const excludedIds: mongoose.Types.ObjectId[] = [
-    ...(currentUser.friends || []), 
-    currentUser._id
-  ];
+  if (!dbUser) {
+    return []; // Or handle as you like — maybe throw an error or redirect
+  }
+
+  // Now fetch recommended users: 
+  // - exclude current user
+  // - exclude current user's friends
+  // - only onboarded users
 
   const recommendedUsers = await User.find({
-    _id: { $nin: excludedIds },
-    isOnboarded: true
-  }).lean<IUser[]>();
+    userId: { $ne: user.id }, // exclude current user by userId
+    _id: { $nin: dbUser.friends }, // exclude friends by _id
+    isOnboarded: true,
+  });
 
-  return recommendedUsers;
+  return recommendedUsers; // Return it, no res.status here (function-style, like Code 2)
 }
