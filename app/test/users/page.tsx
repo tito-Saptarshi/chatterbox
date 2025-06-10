@@ -1,14 +1,21 @@
-import { RecommendedUsers } from "@/app/components/RecommendedUsers";
+
 import { currentUser } from "@clerk/nextjs/server";
-import React from "react";
+import { connectDB } from "@/lib/db";
+import User from "@/models/User";
+import { redirect } from "next/navigation";
+import { RecommendedUsers } from "@/app/components/RecommendedUsers";
 
-const Page = async () => {
+export default async function Page() {
   const user = await currentUser();
-  return (
-    <div>
-      <RecommendedUsers user={user} />
-    </div>
-  );
-};
+  if(!user) redirect("/sign-in");
+  await connectDB();
 
-export default Page;
+  const currentUserDoc = await User.findOne({ userId: user.id });
+  if (!currentUserDoc) return <p>User not found in DB.</p>;
+
+  return (
+    <main className="p-4">
+      <RecommendedUsers user={currentUserDoc} />
+    </main>
+  );
+}

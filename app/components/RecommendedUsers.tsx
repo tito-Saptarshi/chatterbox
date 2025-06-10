@@ -1,64 +1,38 @@
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
-import { RecommendedUserCard } from "./RecommendedUsersCard";
-import { IUser } from "@/lib/types";
+import { FriendRequestButton } from "./FriendRequestButton";
 import { getRecommendedUsers } from "@/lib/hooks/getRecommendedUsers";
+import { IUser } from "@/lib/types";
+import { RecommendedUserCard } from "./RecommendedUsersCard";
 
-export async function RecommendedUsers(user: IUser) {
-  // const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
+export async function RecommendedUsers({ user }: { user: IUser }) {
+  const users = await getRecommendedUsers();
 
-  // const filteredFriends = friends.filter((friend) =>
-  //   friend.name.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
-
-  // const filteredRecommended = recommended.filter((user) =>
-  //   user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
-
-  const handleSendRequest = () => {
-    // setSentRequests((prev) => new Set(prev).add(userId));
-  };
-
-  // const handleStartChat = (userId: string) => {
-  //   console.log("Starting chat with user:", userId);
-  //   // Implement chat functionality here
-  // };
-
-
-  const recommendedUsers = await getRecommendedUsers(user.userId);
-  console.log("Recommended Users: ", recommendedUsers);
-  
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Sparkles className="h-5 w-5 text-purple-600" />
-            <span>Recommended for You</span>
-            <Badge variant="secondary">{recommendedUsers.length}</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {recommendedUsers.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              {"searchQuery"
-                ? "No recommended users found matching your search."
-                : "No recommendations available."}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2">
+          <Sparkles className="text-purple-600" />
+          <span>Recommended for You</span>
+          <Badge variant="secondary">{users.length}</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {users.length === 0 ? (
+          <p className="text-gray-500">No recommendations yet.</p>
+        ) : (
+          users.map((u) => (
+            <div
+              key={u.userId}
+              className="border p-4 rounded-lg hover:bg-gray-50 transition"
+            >
+              <RecommendedUserCard user={u} />
+              <FriendRequestButton sendUserId={u.userId} />
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recommendedUsers.map((user: IUser) => (
-                <RecommendedUserCard
-                  key={user.userId}
-                  user={user}
-                  // onSendRequest={handleSendRequest}
-                />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
   );
 }
