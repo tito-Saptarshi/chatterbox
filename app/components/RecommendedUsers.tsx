@@ -5,10 +5,12 @@ import { FriendRequestButton } from "./FriendRequestButton";
 import { getRecommendedUsers } from "@/lib/hooks/getRecommendedUsers";
 import { IUser } from "@/lib/types";
 import { RecommendedUserCard } from "./RecommendedUsersCard";
+import { getOnboardedUserOrRedirect } from "@/lib/hooks/getOnboardedUser";
 
 export async function RecommendedUsers({ user }: { user: IUser }) {
   const users = await getRecommendedUsers();
-
+  const loggedInUser = await getOnboardedUserOrRedirect();
+  
   return (
     <Card>
       <CardHeader>
@@ -27,8 +29,8 @@ export async function RecommendedUsers({ user }: { user: IUser }) {
               key={u.userId}
               className="border p-4 rounded-lg hover:bg-gray-50 transition"
             >
-              <RecommendedUserCard user={u} />
-              <FriendRequestButton sendUserId={u.userId} />
+              <RecommendedUserCard user={u} loggedInUser={loggedInUser}/>
+              {/* <FriendRequestButton sendUserId={u.userId} /> */}
             </div>
           ))
         )}

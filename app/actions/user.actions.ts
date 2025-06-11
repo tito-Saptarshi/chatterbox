@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { upsertStreamUser } from "@/lib/stream";
 import FriendRequest from "@/models/FriendRequest";
+import mongoose from "mongoose";
 
 export const onboarding = async (prevState: any, formData: FormData) => {
   const { userId } = await auth();
@@ -215,15 +216,15 @@ export const onboarding = async (prevState: any, formData: FormData) => {
 
 //      const friendRequest = await FriendRequest.create({
 //       sender: currentUser._id,
-//       recipient: sendUser._id, 
+//       recipient: sendUser._id,
 //       senderUserId: currentUser.userId,
-//       recipientUserId: sendUser.userId,     
+//       recipientUserId: sendUser.userId,
 //     });
 
 //     return {
-//       ...prevState, 
+//       ...prevState,
 //       status: "SUCCESS",
-//       type: "Sent", 
+//       type: "Sent",
 //     }
 
 //   } catch (error) {
@@ -237,43 +238,107 @@ export const onboarding = async (prevState: any, formData: FormData) => {
 //   }
 // };
 
-
 export const sendRequest = async (prevState: any, receiverId: string) => {
+  const session = await mongoose.startSession();
   try {
     const { userId } = await auth();
-    if (!userId) return { ...prevState, error: "Not logged in", status: "ERROR", type: "None" };
+    if (!userId)
+      return {
+        ...prevState,
+        error: "Not logged in",
+        status: "ERROR",
+        type: "None",
+      };
     if (userId === receiverId)
-      return { ...prevState, error: "Cannot send to yourself", status: "ERROR", type: "None" };
+      return {
+        ...prevState,
+        error: "Cannot send to yourself",
+        status: "ERROR",
+        type: "None",
+      };
 
     await connectDB();
 
     const target = await User.findOne({ userId: receiverId });
-    if (!target) return { ...prevState, error: "User not found", status: "ERROR", type: "None" };
+    if (!target)
+      return {
+        ...prevState,
+        error: "User not found",
+        status: "ERROR",
+        type: "None",
+      };
 
     const me = await User.findOne({ userId });
 
-    const sent = await FriendRequest.findOne({ senderUserId: userId, recipientUserId: receiverId });
-    if (sent)
-      return { ...prevState, error: "Already sent", status: "ERROR", type: "Sent" };
-
-    const rec = await FriendRequest.findOne({ senderUserId: receiverId, recipientUserId: userId });
-    if (rec)
-      return { ...prevState, error: "Request received", status: "ERROR", type: "Received" };
-
-    if (me!.friends.includes(target!._id))
-      return { ...prevState, error: "Already friends", status: "ERROR", type: "friends" };
-
-    await FriendRequest.create({
-      sender: me!._id,
-      recipient: target!._id,
+    const sent = await FriendRequest.findOne({
       senderUserId: userId,
       recipientUserId: receiverId,
     });
+    if (sent)
+      return {
+        ...prevState,
+        error: "Already sent",
+        status: "ERROR",
+        type: "Sent",
+      };
+
+    const rec = await FriendRequest.findOne({
+      senderUserId: receiverId,
+      recipientUserId: userId,
+    });
+    if (rec)
+      return {
+        ...prevState,
+        error: "Request received",
+        status: "ERROR",
+        type: "Received",
+      };
+
+    if (me!.friends.includes(target!._id))
+      return {
+        ...prevState,
+        error: "Already friends",
+        status: "ERROR",
+        type: "friends",
+      };
+
+    session.startTransaction();
+
+    const friendRequest = await FriendRequest.create(
+      [
+        {
+          sender: me!._id,
+          recipient: target!._id,
+          senderUserId: userId,
+          recipientUserId: receiverId,
+        },
+      ],
+      { session }
+    );
+
+    await User.updateOne(
+      { _id: me!._id },
+      { $addToSet: { sentRequests: target!._id } },
+      { session }
+    );
+
+    await User.updateOne(
+      { _id: target!._id },
+      { $addToSet: { receivedRequests: me!._id } },
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
 
     return { ...prevState, status: "SUCCESS", type: "Sent" };
-
   } catch (err) {
     console.error(err);
-    return { ...prevState, error: "Unexpected error", status: "ERROR", type: "None" };
+    return {
+      ...prevState,
+      error: "Unexpected error",
+      status: "ERROR",
+      type: "None",
+    };
   }
 };
