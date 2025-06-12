@@ -342,3 +342,98 @@ export const sendRequest = async (prevState: any, receiverId: string) => {
     };
   }
 };
+
+export const acceptRequest = async (prevState: any, senderUserId: string) => {
+  const session = await mongoose.startSession();
+
+  try {
+    const { userId: receiverUserId } = await auth();
+    if (!receiverUserId) {
+      return {
+        ...prevState,
+        error: "Not logged in",
+        status: "ERROR",
+        type: "None",
+      };
+    }
+
+    if (receiverUserId === senderUserId) {
+      return {
+        ...prevState,
+        error: "Cannot accept your own request",
+        status: "ERROR",
+        type: "None",
+      };
+    }
+
+    await connectDB();
+
+    const sender = await User.findOne({ userId: senderUserId });
+    const receiver = await User.findOne({ userId: receiverUserId });
+
+    if (!sender || !receiver) {
+      return {
+        ...prevState,
+        error: "User not found",
+        status: "ERROR",
+        type: "None",
+      };
+    }
+
+    const friendRequest = await FriendRequest.findOne({
+      senderUserId,
+      recipientUserId: receiverUserId,
+      status: "pending",
+    });
+
+    if (!friendRequest) {
+      return {
+        ...prevState,
+        error: "No pending request found",
+        status: "ERROR",
+        type: "None",
+      };
+    }
+
+    session.startTransaction();
+
+    // 1. Add each other to friends list
+    await User.updateOne(
+      { _id: sender._id },
+      { $addToSet: { friends: receiver._id }, $pull: { sentRequests: receiver._id } },
+      { session }
+    );
+
+    await User.updateOne(
+      { _id: receiver._id },
+      { $addToSet: { friends: sender._id }, $pull: { receivedRequests: sender._id } },
+      { session }
+    );
+
+    // 2. Update FriendRequest status
+    await FriendRequest.updateOne(
+      { _id: friendRequest._id },
+      { $set: { status: "accepted" } },
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      ...prevState,
+      status: "SUCCESS",
+      type: "Accepted",
+    };
+  } catch (error) {
+    console.error("Accept request error:", error);
+    await session.abortTransaction();
+    session.endSession();
+    return {
+      ...prevState,
+      error: "Unexpected error",
+      status: "ERROR",
+      type: "None",
+    };
+  }
+};

@@ -1,21 +1,21 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 import User from "@/models/User";
 import { connectDB } from "../db";
 
 export async function getOnboardedUserOrRedirect() {
-  const user = await currentUser();
+  const { userId } = await auth()
 
-  if (!user) {
+  if (!userId) {
     redirect("/sign-in");
   }
 
   await connectDB();
 
-  const dbUser = await User.findOne({ userId: user.id});
+  const dbUser = await User.findOne({ userId });
   
-  console.log( "user.id " + user.id);
+  console.log( "user.id " + userId);
   console.log( "dbUser " + dbUser);
   
 
