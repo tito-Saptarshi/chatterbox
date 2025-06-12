@@ -21,7 +21,7 @@ const Page = async () => {
         <CardContent>
           {filteredRequests.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              {searchQuery
+              {"searchQuery"
                 ? "No friend requests found matching your search."
                 : "No pending friend requests."}
             </div>
