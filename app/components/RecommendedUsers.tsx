@@ -1,13 +1,11 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
-import { FriendRequestButton } from "./FriendRequestButton";
 import { getRecommendedUsers } from "@/lib/hooks/getRecommendedUsers";
-import { IUser } from "@/lib/types";
 import { RecommendedUserCard } from "./RecommendedUsersCard";
 import { getOnboardedUserOrRedirect } from "@/lib/hooks/getOnboardedUser";
 
-export async function RecommendedUsers({ user }: { user: IUser }) {
+export async function RecommendedUsers() {
   const users = await getRecommendedUsers();
   const loggedInUser = await getOnboardedUserOrRedirect();
   
