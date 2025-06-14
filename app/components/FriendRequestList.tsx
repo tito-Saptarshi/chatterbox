@@ -26,7 +26,7 @@ export function FriendRequestList({
     <div className="space-y-3">
       {requests.map((request) => (
         <FriendRequestCard
-          key={request.id}
+          key={request._id}
           userId={request.userId}
           username={request.username}
           profilePic={request.profilePic}

@@ -23,5 +23,9 @@ export async function getFriendsRequests() {
   console.log("allUsers " + allUsers);
 
   // If everything is OK, return dbUser or minimal data
-  return allUsers.receivedRequests;
+  // return allUsers.receivedRequests;
+
+  const cleanRequests = JSON.parse(JSON.stringify(allUsers.receivedRequests));
+
+  return cleanRequests;
 }
