@@ -24,7 +24,7 @@ export function FriendUserCard({ user }: { user: User }) {
           </Avatar>
         </div>
         <div>
-          <h3 className="font-medium text-gray-900">{user.username}</h3>
+          <h3 className="font-medium ">{user.username}</h3>
           {/* <p className="text-sm text-gray-500">
             {user.status === "online"
               ? "Online"

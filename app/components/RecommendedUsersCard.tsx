@@ -29,7 +29,7 @@ export function RecommendedUserCard({ user, loggedInUser }: Props) {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4">
+    <div className="w-full flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       {/* Left Section: Avatar and Details */}
       <div className="flex items-center gap-4">
         <Avatar className="w-14 h-14">
@@ -52,7 +52,7 @@ export function RecommendedUserCard({ user, loggedInUser }: Props) {
       </div>
 
       {/* Right Section: Button */}
-      <div className="sm:ml-auto w-full sm:w-auto">
+      <div className="w-full md:w-auto">
         <FriendRequestButton sendUserId={user.userId} type={type} />
       </div>
     </div>
