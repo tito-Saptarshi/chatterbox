@@ -22,7 +22,7 @@ import { onboarding } from "../actions/user.actions";
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+
 
   const [formData, setFormData] = useState({
     username: "",
