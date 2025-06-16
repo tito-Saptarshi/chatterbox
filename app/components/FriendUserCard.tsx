@@ -1,9 +1,8 @@
-
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User } from "@/lib/types";
 import { MessageCircle } from "lucide-react";
+import Link from "next/link";
 
 export function FriendUserCard({ user }: { user: User }) {
   return (
@@ -37,14 +36,16 @@ export function FriendUserCard({ user }: { user: User }) {
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <Button
-          size="sm"
-          onClick={() => {}}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          <MessageCircle className="h-4 w-4 mr-2" />
-          Chat
-        </Button>
+        <Link href={`/chat/${user.userId}`}>
+          <Button
+            size="sm"
+            onClick={() => {}}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Chat
+          </Button>
+        </Link>
       </div>
     </div>
   );
