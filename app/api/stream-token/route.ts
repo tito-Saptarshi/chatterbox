@@ -11,6 +11,8 @@ export async function GET() {
     }
 
     const token = generateStreamToken(user.id);
+    console.log("Generated Stream Token:", token);
+    
     return NextResponse.json({ token });
   } catch (error: any) {
     console.error("Error in stream-token route:", error.message);

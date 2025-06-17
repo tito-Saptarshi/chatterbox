@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const { userId } = await auth();
-
   const { id } = await  params;
 
   if (!userId) {
@@ -16,11 +15,11 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   const user = await getChatUser();
 
-  const streamToken = generateStreamToken(userId);
+  const streamToken = generateStreamToken(user._id);
 
   console.log("streamToken : " , streamToken);
   console.log("params.id : " , id);
-  console.log("user : " , user);
+  console.log("user --> : " , user);
 
-  return <ChatClientPage targetUserId={id} streamToken={streamToken!} user={user}/>;
+  return <ChatClientPage targetUserId={id} streamToken={streamToken || ""} user={user}/>;
 }

@@ -1,3 +1,5 @@
+"use server"
+
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
@@ -27,7 +29,8 @@ export async function getChatUser() {
     redirect("/onboarding");
   }
 
-const cleanRequests = JSON.parse(JSON.stringify(dbUser.receivedRequests));
+const cleanRequests = JSON.parse(JSON.stringify(dbUser));
+console.log("cleanRequests : ", cleanRequests);
 
   // If everything is OK, return dbUser or minimal data
   return cleanRequests;
