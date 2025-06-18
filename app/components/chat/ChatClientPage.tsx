@@ -27,6 +27,7 @@ export default function ChatClientPage({
   targetUserId,
   streamToken,
   user,
+ 
 }: {
   targetUserId: string;
   streamToken: string;

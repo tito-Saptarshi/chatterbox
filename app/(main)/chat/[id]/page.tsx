@@ -15,11 +15,11 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   const user = await getChatUser();
 
-  const streamToken = generateStreamToken(user._id);
+  const streamToken = generateStreamToken(user._id.toString());
 
   console.log("streamToken : " , streamToken);
   console.log("params.id : " , id);
   console.log("user --> : " , user);
 
-  return <ChatClientPage targetUserId={id} streamToken={streamToken || ""} user={user}/>;
+  return <ChatClientPage targetUserId={id} streamToken={streamToken || ""} user={user} />;
 }

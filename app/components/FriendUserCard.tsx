@@ -36,7 +36,7 @@ export function FriendUserCard({ user }: { user: User }) {
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <Link href={`/chat/${user.userId}`}>
+        <Link href={`/chat/${user._id}`}>
           <Button
             size="sm"
             onClick={() => {}}
